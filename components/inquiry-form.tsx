@@ -4,15 +4,29 @@ import { useState } from "react"
 import { Send } from "lucide-react"
 
 export function InquiryForm({ product }: { product?: string }) {
-  const [submitted, setSubmitted] = useState(false)
+  const [state, setState] = useState<"idle" | "submitting" | "success" | "error">("idle")
+  const [error, setError] = useState("")
 
   return (
     <form
       id="inquiry"
       className="inquiry-form"
-      onSubmit={(event) => {
+      onSubmit={async (event) => {
         event.preventDefault()
-        setSubmitted(true)
+        setState("submitting")
+        setError("")
+        const response = await fetch("/api/inquiries", {
+          method: "POST",
+          body: new FormData(event.currentTarget),
+        })
+        if (response.ok) {
+          setState("success")
+          event.currentTarget.reset()
+          return
+        }
+        const payload = await response.json().catch(() => ({ error: "Inquiry submission failed." }))
+        setError(payload.error || "Inquiry submission failed.")
+        setState("error")
       }}
     >
       <div className="form-grid">
@@ -51,14 +65,17 @@ export function InquiryForm({ product }: { product?: string }) {
       </label>
       <label>
         Message
-        <textarea name="message" rows={4} placeholder="Tell us about your sourcing plan" />
+        <textarea name="message" rows={4} required placeholder="Tell us about your sourcing plan" />
       </label>
       <div className="upload-placeholder">File upload placeholder for drawings, packaging references, or product briefs</div>
-      <button type="submit" className="primary-action">
-        Submit Inquiry <Send size={16} />
+      <button type="submit" className="primary-action" disabled={state === "submitting"}>
+        {state === "submitting" ? "Submitting..." : "Submit Inquiry"} <Send size={16} />
       </button>
-      {submitted ? (
-        <p className="success-state">Thank you. Your inquiry draft is ready for the production Supabase connection step.</p>
+      {state === "success" ? (
+        <p className="success-state">Thank you. Your inquiry has been received by the JINFANWAN team.</p>
+      ) : null}
+      {state === "error" ? (
+        <p className="error-state">{error}</p>
       ) : null}
     </form>
   )

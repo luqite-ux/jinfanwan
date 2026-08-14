@@ -507,6 +507,12 @@ textarea {
   font-weight: 800;
 }
 
+.error-state {
+  margin: 0;
+  color: #b42318;
+  font-weight: 800;
+}
+
 .page-hero {
   padding: 86px 0 54px;
 }
