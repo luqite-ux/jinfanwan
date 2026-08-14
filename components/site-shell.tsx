@@ -1,16 +1,21 @@
+"use client"
+
 import Link from "next/link"
-import { ArrowRight, Mail, Menu, Phone } from "lucide-react"
+import { useState } from "react"
+import { ArrowRight, Mail, Menu, Phone, X } from "lucide-react"
 import { company, navItems } from "@/lib/site-data"
 
 export function Header() {
+  const [menuOpen, setMenuOpen] = useState(false)
+
   return (
     <header className="site-header">
       <Link href="/" className="brand-link" aria-label="JINFANWAN Home">
         <img src={company.logo} alt="JINFANWAN" className="brand-logo" />
       </Link>
-      <nav className="desktop-nav" aria-label="Primary navigation">
+      <nav className={menuOpen ? "desktop-nav menu-open" : "desktop-nav"} aria-label="Primary navigation">
         {navItems.map((item) => (
-          <Link key={item.href} href={item.href}>
+          <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>
             {item.label}
           </Link>
         ))}
@@ -18,8 +23,14 @@ export function Header() {
       <Link href="/contact#inquiry" className="quote-button">
         Request a Quote <ArrowRight size={16} />
       </Link>
-      <button className="mobile-menu" aria-label="Open navigation">
-        <Menu size={22} />
+      <button
+        type="button"
+        className="mobile-menu"
+        aria-label={menuOpen ? "Close navigation" : "Open navigation"}
+        aria-expanded={menuOpen}
+        onClick={() => setMenuOpen((open) => !open)}
+      >
+        {menuOpen ? <X size={22} /> : <Menu size={22} />}
       </button>
     </header>
   )

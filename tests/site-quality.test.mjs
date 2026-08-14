@@ -37,6 +37,15 @@ test("real brand and product assets exist", () => {
   }
 })
 
+test("mobile navigation exposes a real expandable menu", () => {
+  const shell = fs.readFileSync(path.join(root, "components/site-shell.tsx"), "utf8")
+  const styles = fs.readFileSync(path.join(root, "app/globals.css"), "utf8")
+
+  assert.match(shell, /aria-expanded=\{menuOpen\}/)
+  assert.match(shell, /desktop-nav menu-open/)
+  assert.match(styles, /\.desktop-nav\.menu-open/)
+})
+
 test("site copy avoids forbidden retail and warranty language", () => {
   const forbidden = /\b(warranty|warranties|guarantee|guaranteed|cart|checkout|payment)\b|质保|保修|质量保证/i
   const files = []
