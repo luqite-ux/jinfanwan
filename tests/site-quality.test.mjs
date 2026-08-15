@@ -67,6 +67,10 @@ test("detail routes resolve items from asynchronous Next.js params", async () =>
   assert.equal(product?.slug, "hinge-lock-plastic-square")
 })
 
+test("customer admin login handler exists", () => {
+  assert.equal(fs.existsSync(path.join(root, "lib/admin-login.ts")), true)
+})
+
 test("site copy avoids forbidden retail and warranty language", () => {
   const forbidden = /\b(warranty|warranties|guarantee|guaranteed|cart|checkout|payment)\b|质保|保修|质量保证/i
   const files = []
