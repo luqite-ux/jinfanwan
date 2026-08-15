@@ -2,22 +2,24 @@ import { notFound } from "next/navigation"
 import { CheckCircle2 } from "lucide-react"
 import { Footer, Header, PageHero } from "@/components/site-shell"
 import { InquiryForm } from "@/components/inquiry-form"
-import { products } from "@/lib/site-data"
+import { findByRouteParams, products } from "@/lib/site-data"
+
+type ProductDetailProps = { params: Promise<{ slug: string }> }
 
 export function generateStaticParams() {
   return products.map((product) => ({ slug: product.slug }))
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
-  const product = products.find((item) => item.slug === params.slug)
+export async function generateMetadata({ params }: ProductDetailProps) {
+  const product = await findByRouteParams(products, params)
   return {
     title: product ? `${product.name} | JINFANWAN` : "Product | JINFANWAN",
     description: product?.summary,
   }
 }
 
-export default function ProductDetailPage({ params }: { params: { slug: string } }) {
-  const product = products.find((item) => item.slug === params.slug)
+export default async function ProductDetailPage({ params }: ProductDetailProps) {
+  const product = await findByRouteParams(products, params)
   if (!product) notFound()
 
   return (

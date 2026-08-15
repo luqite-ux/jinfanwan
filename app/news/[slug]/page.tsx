@@ -1,13 +1,15 @@
 import { notFound } from "next/navigation"
 import { Footer, Header, PageHero } from "@/components/site-shell"
-import { news } from "@/lib/site-data"
+import { findByRouteParams, news } from "@/lib/site-data"
+
+type NewsDetailProps = { params: Promise<{ slug: string }> }
 
 export function generateStaticParams() {
   return news.map((post) => ({ slug: post.slug }))
 }
 
-export default function NewsDetailPage({ params }: { params: { slug: string } }) {
-  const post = news.find((item) => item.slug === params.slug)
+export default async function NewsDetailPage({ params }: NewsDetailProps) {
+  const post = await findByRouteParams(news, params)
   if (!post) notFound()
 
   return (

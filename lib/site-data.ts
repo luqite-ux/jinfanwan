@@ -8,6 +8,14 @@ export const company = {
   logo: "/images/brand/jinfanwan-logo.png",
 }
 
+export async function findByRouteParams<T extends { slug: string }>(
+  items: T[],
+  params: Promise<{ slug: string }>,
+) {
+  const { slug } = await params
+  return items.find((item) => item.slug === slug)
+}
+
 export const navItems = [
   { href: "/", label: "Home" },
   { href: "/about-us", label: "About Us" },

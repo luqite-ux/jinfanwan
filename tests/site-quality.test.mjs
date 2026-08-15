@@ -3,6 +3,7 @@ import fs from "node:fs"
 import path from "node:path"
 import test from "node:test"
 import { company } from "../lib/site-data.ts"
+import * as siteData from "../lib/site-data.ts"
 
 const root = path.resolve(import.meta.dirname, "..")
 
@@ -54,6 +55,16 @@ test("formal contact email matches the production hostname", () => {
 
   assert.equal(hostname, "jinfanwanfoodstorage.com")
   assert.equal(emailDomain, hostname)
+})
+
+test("detail routes resolve items from asynchronous Next.js params", async () => {
+  assert.equal(typeof siteData.findByRouteParams, "function")
+  const product = await siteData.findByRouteParams(
+    siteData.products,
+    Promise.resolve({ slug: "hinge-lock-plastic-square" }),
+  )
+
+  assert.equal(product?.slug, "hinge-lock-plastic-square")
 })
 
 test("site copy avoids forbidden retail and warranty language", () => {
