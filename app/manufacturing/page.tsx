@@ -2,6 +2,12 @@ import { Factory } from "lucide-react"
 import { Footer, Header, PageHero, SectionHeading } from "@/components/site-shell"
 import { stats } from "@/lib/site-data"
 
+export const metadata = {
+  title: "Manufacturing Capacity | JINFANWAN",
+  description: "Review JINFANWAN production area, workshops, injection molding, compression molding, liquid silicone equipment, and monthly lid capacity.",
+  alternates: { canonical: "/manufacturing" },
+}
+
 export default function ManufacturingPage() {
   return (
     <>
@@ -10,7 +16,7 @@ export default function ManufacturingPage() {
         <PageHero
           eyebrow="Manufacturing"
           title="Scalable production for food storage container programs"
-          text="JINFANWAN supports plastic lid, silicone lid, glass container, and coordinated container family production."
+          text="JINFANWAN supports plastic and silicone lid production for coordinated food storage container programs."
         />
         <section className="stats-strip">
           {stats.map(([value, label]) => (
@@ -20,7 +26,7 @@ export default function ManufacturingPage() {
         <section className="split-section">
           <div>
             <SectionHeading eyebrow="Factory capability" title="Equipment for flexible production planning" />
-            {["Injection molding for plastic lid structures", "Dual-head molding capacity for matched container programs", "Liquid silicone equipment for silicone lid directions", "Workshop flow for sampling, production, and shipment preparation"].map((item) => (
+            {["Injection molding for plastic lid structures", "Dual-head compression molding for coordinated lid programs", "Liquid silicone equipment for silicone lid structures", "Workshop flow for sampling, production, and shipment preparation"].map((item) => (
               <p className="icon-line" key={item}><Factory size={18} /> {item}</p>
             ))}
           </div>

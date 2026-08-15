@@ -67,7 +67,6 @@ export function InquiryForm({ product }: { product?: string }) {
         Message
         <textarea name="message" rows={4} required placeholder="Tell us about your sourcing plan" />
       </label>
-      <div className="upload-placeholder">File upload placeholder for drawings, packaging references, or product briefs</div>
       <button type="submit" className="primary-action" disabled={state === "submitting"}>
         {state === "submitting" ? "Submitting..." : "Submit Inquiry"} <Send size={16} />
       </button>

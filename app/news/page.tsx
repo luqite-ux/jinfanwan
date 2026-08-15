@@ -1,23 +1,23 @@
-import Link from "next/link"
-import { ArrowRight } from "lucide-react"
 import { Footer, Header, PageHero } from "@/components/site-shell"
-import { news } from "@/lib/site-data"
+import { getNews } from "@/lib/content-db"
 
-export default function NewsPage() {
+export const metadata = {
+  title: "Company News and Product Updates | JINFANWAN",
+  description: "Read published company news and food storage container product updates from JINFANWAN.",
+  alternates: { canonical: "/news" },
+}
+
+export const revalidate = 60
+
+export default async function NewsPage() {
+  const news = await getNews()
   return (
     <>
       <Header />
       <main>
-        <PageHero eyebrow="News" title="Food container sourcing insights" text="Educational articles for buyers planning food storage container programs." />
+        <PageHero eyebrow="News" title="Company news and product updates" text="Published company and product information will appear here." />
         <section className="section news-list wide">
-          {news.map((post) => (
-            <Link href={`/news/${post.slug}`} key={post.slug}>
-              <time>{post.date}</time>
-              <h3>{post.title}</h3>
-              <p>{post.excerpt}</p>
-              <span>Read article <ArrowRight size={15} /></span>
-            </Link>
-          ))}
+          {news.length ? null : <p className="empty-state">No company updates have been published yet.</p>}
         </section>
       </main>
       <Footer />

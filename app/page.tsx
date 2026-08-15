@@ -2,20 +2,24 @@ import Link from "next/link"
 import { ArrowRight, CheckCircle2, Factory, Sparkles } from "lucide-react"
 import { Footer, Header, SectionHeading } from "@/components/site-shell"
 import { InquiryForm } from "@/components/inquiry-form"
-import { categories, company, faqs, news, processSteps, products, stats } from "@/lib/site-data"
+import { getCategories, getNews, getProducts } from "@/lib/content-db"
+import { company, faqs, processSteps, stats } from "@/lib/site-data"
 
-export default function HomePage() {
+export const revalidate = 60
+
+export default async function HomePage() {
+  const [categories, products, news] = await Promise.all([getCategories(), getProducts(), getNews()])
   return (
     <>
       <Header />
       <main>
         <section className="hero">
           <div className="hero-copy">
-            <span className="eyebrow">Food-grade container manufacturing</span>
-            <h1>Premium Food Storage Containers for Global Buyers</h1>
+            <span className="eyebrow">Food container manufacturing</span>
+            <h1>Food Storage Containers for Global B2B Buyers</h1>
             <p>
-              JINFANWAN manufactures high borosilicate glass, plastic, silicone-lid, and stainless
-              steel lid food storage container programs for B2B sourcing teams.
+              JINFANWAN develops plastic food containers and coordinated plastic, tempered-glass,
+              and silicone lid structures for international sourcing programs.
             </p>
             <div className="hero-actions">
               <Link href="/contact#inquiry" className="primary-action">Request a Quote <ArrowRight size={16} /></Link>
@@ -26,7 +30,7 @@ export default function HomePage() {
             <div className="glow-card float-card">
               <img src="/images/products/product-showcase-04.png" alt="JINFANWAN food storage container series" />
             </div>
-            <div className="material-note"><Sparkles size={18} /> Clear, bright, custom-ready container programs</div>
+            <div className="material-note"><Sparkles size={18} /> Clear product options for custom sourcing programs</div>
           </div>
         </section>
 
@@ -65,15 +69,15 @@ export default function HomePage() {
           />
           <div className="product-grid">
             {products.slice(0, 4).map((product) => (
-              <article className="product-card" key={product.slug}>
+              <Link className="product-card" href={`/products/${product.slug}`} key={product.slug}>
                 <img src={product.image} alt={product.name} />
                 <div>
                   <span className="pill">{product.category}</span>
                   <h3>{product.name}</h3>
                   <p>{product.summary}</p>
-                  <Link href={`/products/${product.slug}`}>Send Inquiry <ArrowRight size={15} /></Link>
+                  <span className="card-action">View product <ArrowRight size={15} /></span>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         </section>
@@ -82,8 +86,8 @@ export default function HomePage() {
           <div>
             <SectionHeading
               eyebrow="Manufacturing capability"
-              title="From R&D design to scalable container production"
-              text="The factory integrates independent R&D, design, production, and sales with equipment capacity for plastic and silicone lid programs."
+              title="From product development to scalable container production"
+              text="The company integrates product development, design, production, and sales, with equipment capacity for plastic and silicone lid programs."
             />
             <div className="capability-list">
               {["10 injection molding machines", "6 dual-head molding machine sets", "10 liquid silicone machines", "3 workshops across 6,000 m2"].map((item) => (
@@ -92,10 +96,10 @@ export default function HomePage() {
             </div>
           </div>
           <div className="glass-panel">
-            <h3>Sealing and material directions</h3>
+            <h3>Sealing and material options</h3>
             <p>
               JINFANWAN focuses on practical four-side locking structures, silicone sealing ring
-              concepts, high borosilicate glass bodies, and coordinated lid variants for vegetables,
+              structures, high borosilicate glass bodies, and coordinated lid variants for vegetables,
               dry food, prepared meals, refrigerator storage, microwave heating, and room-temperature storage.
             </p>
           </div>
@@ -128,13 +132,13 @@ export default function HomePage() {
           <div>
             <SectionHeading eyebrow="News" title="Sourcing insights" />
             <div className="news-list">
-              {news.map((post) => (
+              {news.length ? news.map((post) => (
                 <Link href={`/news/${post.slug}`} key={post.slug}>
                   <time>{post.date}</time>
                   <h3>{post.title}</h3>
                   <p>{post.excerpt}</p>
                 </Link>
-              ))}
+              )) : <p className="empty-state">No company updates have been published yet.</p>}
             </div>
           </div>
         </section>

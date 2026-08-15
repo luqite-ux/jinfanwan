@@ -1,6 +1,12 @@
 import { Footer, Header, PageHero, SectionHeading } from "@/components/site-shell"
 import { company, stats } from "@/lib/site-data"
 
+export const metadata = {
+  title: "About JINFANWAN | Food Container Manufacturer",
+  description: "Learn about Suzhou Golden Rice Bowl New Material Technology Co., Ltd., its food container product focus, production area, equipment, and contact details.",
+  alternates: { canonical: "/about-us" },
+}
+
 export default function AboutPage() {
   return (
     <>

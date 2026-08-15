@@ -92,7 +92,7 @@ img {
 .footer-cta {
   border: 0;
   color: white;
-  background: linear-gradient(135deg, var(--brand) 0%, #26b8bb 100%);
+  background: linear-gradient(135deg, #087845 0%, #0b7378 100%);
   box-shadow: 0 12px 34px rgba(17, 147, 81, 0.24);
   padding: 0 20px;
 }
@@ -341,13 +341,20 @@ h3 {
 }
 
 .category-card span,
-.product-card a,
+.product-card .card-action,
 .news-list span {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   color: var(--brand-deep);
   font-weight: 800;
+}
+
+.empty-state {
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .product-card {
@@ -493,14 +500,6 @@ textarea {
   resize: vertical;
 }
 
-.upload-placeholder {
-  border: 1px dashed rgba(17, 147, 81, 0.38);
-  border-radius: 16px;
-  padding: 16px;
-  color: var(--muted);
-  background: rgba(223, 248, 234, 0.45);
-}
-
 .success-state {
   margin: 0;
   color: var(--brand-deep);
@@ -590,9 +589,13 @@ textarea {
   line-height: 1.7;
 }
 
-.footer-cta {
+.footer a.footer-cta {
+  display: inline-flex;
+  height: 44px;
+  line-height: 1;
+  color: #ffffff;
   width: fit-content;
-  margin-top: 14px;
+  margin: 14px 0 0;
 }
 
 @keyframes float-card {

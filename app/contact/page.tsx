@@ -2,6 +2,12 @@ import { Footer, Header, PageHero } from "@/components/site-shell"
 import { InquiryForm } from "@/components/inquiry-form"
 import { company } from "@/lib/site-data"
 
+export const metadata = {
+  title: "Contact JINFANWAN | Send a Product Inquiry",
+  description: "Contact JINFANWAN about food container product selection, estimated order quantity, customization, samples, and packaging requirements.",
+  alternates: { canonical: "/contact" },
+}
+
 export default function ContactPage() {
   return (
     <>

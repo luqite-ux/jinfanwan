@@ -9,21 +9,21 @@ const sora = Sora({ subsets: ['latin'], variable: '--font-sora' })
 
 export const metadata: Metadata = {
   metadataBase: new URL(company.siteUrl),
-  title: 'JINFANWAN | Premium Food Storage Container Manufacturer',
+  title: 'JINFANWAN | Food Storage Container Manufacturer',
   description:
     'Suzhou Golden Rice Bowl New Material Technology Co., Ltd. manufactures high borosilicate glass food containers, plastic food containers, silicone glass lids, and OEM/ODM food storage container solutions for global B2B buyers.',
-  generator: 'v0.app',
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'JINFANWAN | Premium Food Storage Container Manufacturer',
+    title: 'JINFANWAN | Food Storage Container Manufacturer',
     description:
-      'High borosilicate glass, plastic, and silicone-lid food storage container manufacturing for global B2B buyers. OEM/ODM programs, export-ready production.',
+      'Plastic food containers and coordinated plastic, tempered-glass, and silicone lid structures for global B2B sourcing programs.',
     type: 'website',
     locale: 'en_US',
     url: company.siteUrl,
     siteName: 'JINFANWAN',
+    images: [{ url: '/images/products/product-showcase-04.png', alt: 'JINFANWAN food storage container range' }],
   },
   icons: {
     icon: [

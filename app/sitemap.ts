@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
-import { company, news, products } from '@/lib/site-data'
+import { getNews, getProducts } from '@/lib/content-db'
+import { company } from '@/lib/site-data'
 
 const staticRoutes = [
   '',
@@ -13,7 +14,10 @@ const staticRoutes = [
   '/contact',
 ]
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export const revalidate = 60
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [products, news] = await Promise.all([getProducts(), getNews()])
   const lastModified = new Date()
   const routes = [
     ...staticRoutes,

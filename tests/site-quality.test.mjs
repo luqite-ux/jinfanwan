@@ -19,6 +19,7 @@ const requiredRoutes = [
   "app/news/page.tsx",
   "app/news/[slug]/page.tsx",
   "app/contact/page.tsx",
+  "app/not-found.tsx",
 ]
 
 const requiredAssets = [
@@ -61,10 +62,10 @@ test("detail routes resolve items from asynchronous Next.js params", async () =>
   assert.equal(typeof siteData.findByRouteParams, "function")
   const product = await siteData.findByRouteParams(
     siteData.products,
-    Promise.resolve({ slug: "hinge-lock-plastic-square" }),
+    Promise.resolve({ slug: "four-side-lock-plastic-series" }),
   )
 
-  assert.equal(product?.slug, "hinge-lock-plastic-square")
+  assert.equal(product?.slug, "four-side-lock-plastic-series")
 })
 
 test("customer admin login handler exists", () => {
@@ -91,4 +92,26 @@ test("site copy avoids forbidden retail and warranty language", () => {
     .map(([file]) => path.relative(root, file))
 
   assert.deepEqual(offenders, [])
+})
+
+test("published copy contains no template, placeholder, or unsupported marketing claims", () => {
+  const forbidden = /v0\.app|file upload placeholder|industry-leading|world-class|top manufacturer|premium food storage/i
+  const files = ["lib/site-data.ts", "components/site-shell.tsx", "components/inquiry-form.tsx", ...requiredRoutes]
+  const offenders = files.filter((file) => forbidden.test(fs.readFileSync(path.join(root, file), "utf8")))
+
+  assert.deepEqual(offenders, [])
+})
+
+test("product records match the four verified brochure image groups", () => {
+  assert.equal(siteData.products.length, 4)
+  assert.deepEqual(
+    siteData.products.map((product) => product.image),
+    [
+      "/images/products/product-showcase-04.png",
+      "/images/products/product-showcase-05.png",
+      "/images/products/product-showcase-06.png",
+      "/images/products/product-showcase-08.png",
+    ],
+  )
+  assert.equal(siteData.news.length, 0, "unverified demo news must not be published")
 })

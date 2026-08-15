@@ -2,6 +2,12 @@ import { Footer, Header, PageHero, SectionHeading } from "@/components/site-shel
 import { InquiryForm } from "@/components/inquiry-form"
 import { processSteps } from "@/lib/site-data"
 
+export const metadata = {
+  title: "OEM and ODM Food Container Programs | JINFANWAN",
+  description: "Discuss food container shape, material, lid structure, color, packaging, sampling, and bulk production requirements with JINFANWAN.",
+  alternates: { canonical: "/custom-solutions" },
+}
+
 export default function CustomSolutionsPage() {
   return (
     <>

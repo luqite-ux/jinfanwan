@@ -43,16 +43,16 @@ export function Footer() {
         <div>
           <img src={company.logo} alt="JINFANWAN" className="footer-logo" />
           <p>
-            Premium food storage container manufacturing for global B2B buyers, covering plastic, glass,
-            silicone, and stainless steel lid container programs.
+            Food storage container manufacturing for global B2B buyers, covering plastic containers and
+            tempered-glass, plastic, and silicone lid structures.
           </p>
         </div>
         <div>
           <h3>Products</h3>
           <Link href="/products">Plastic Food Containers</Link>
-          <Link href="/products">Silicone Glass Food Containers</Link>
-          <Link href="/products">Plastic Glass Food Containers</Link>
-          <Link href="/products">Stainless Steel Lid Series</Link>
+          <Link href="/products">Vented Plastic Food Containers</Link>
+          <Link href="/products">Tempered-Glass Lid Containers</Link>
+          <Link href="/products">Glass and Silicone Storage Lids</Link>
         </div>
         <div>
           <h3>Company</h3>
