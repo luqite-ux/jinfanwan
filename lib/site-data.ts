@@ -1,9 +1,10 @@
 export const company = {
   brand: "JINFANWAN",
   name: "Suzhou Golden Rice Bowl New Material Technology Co., Ltd.",
+  siteUrl: "https://jinfanwanfoodstorage.com",
   address: "2nd Floor, Comprehensive Building, No. 393 Fuping Road, Pingwang Town, Wujiang District, Suzhou, China",
   phone: "18270310577",
-  email: "18912702830@163.COM",
+  email: "info@jinfanwanfoodstorage.com",
   logo: "/images/brand/jinfanwan-logo.png",
 }
 

@@ -1,22 +1,29 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Sora } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { company } from '@/lib/site-data'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const sora = Sora({ subsets: ['latin'], variable: '--font-sora' })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(company.siteUrl),
   title: 'JINFANWAN | Premium Food Storage Container Manufacturer',
   description:
     'Suzhou Golden Rice Bowl New Material Technology Co., Ltd. manufactures high borosilicate glass food containers, plastic food containers, silicone glass lids, and OEM/ODM food storage container solutions for global B2B buyers.',
   generator: 'v0.app',
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     title: 'JINFANWAN | Premium Food Storage Container Manufacturer',
     description:
       'High borosilicate glass, plastic, and silicone-lid food storage container manufacturing for global B2B buyers. OEM/ODM programs, export-ready production.',
     type: 'website',
     locale: 'en_US',
+    url: company.siteUrl,
+    siteName: 'JINFANWAN',
   },
   icons: {
     icon: [
@@ -48,10 +55,29 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const organizationJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: company.name,
+    url: company.siteUrl,
+    logo: `${company.siteUrl}${company.logo}`,
+    email: company.email,
+    telephone: company.phone,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: company.address,
+      addressCountry: 'CN',
+    },
+  }
+
   return (
     <html lang="en" className={`bg-background ${inter.variable} ${sora.variable}`}>
       <body className="font-sans antialiased">
         {children}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

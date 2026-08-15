@@ -2,6 +2,7 @@ import assert from "node:assert/strict"
 import fs from "node:fs"
 import path from "node:path"
 import test from "node:test"
+import { company } from "../lib/site-data.ts"
 
 const root = path.resolve(import.meta.dirname, "..")
 
@@ -44,6 +45,15 @@ test("mobile navigation exposes a real expandable menu", () => {
   assert.match(shell, /aria-expanded=\{menuOpen\}/)
   assert.match(shell, /desktop-nav menu-open/)
   assert.match(styles, /\.desktop-nav\.menu-open/)
+})
+
+test("formal contact email matches the production hostname", () => {
+  assert.equal(typeof company.siteUrl, "string")
+  const hostname = new URL(company.siteUrl).hostname
+  const emailDomain = company.email.split("@")[1]?.toLowerCase()
+
+  assert.equal(hostname, "jinfanwanfoodstorage.com")
+  assert.equal(emailDomain, hostname)
 })
 
 test("site copy avoids forbidden retail and warranty language", () => {
