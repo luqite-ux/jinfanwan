@@ -91,3 +91,19 @@ export async function getNews(locale = "en") {
     content: localized(row.content_i18n, locale) ?? row.content,
   }))
 }
+
+export async function getLanguageConfig() {
+  const db = getSupabaseClient()
+  const tenantId = process.env.NEXT_PUBLIC_TENANT_ID
+  if (!db || !tenantId) return { defaultLanguage: "en", supportedLanguages: ["en"] }
+  const { data, error } = await db
+    .from("tenants")
+    .select("default_language,supported_languages")
+    .eq("id", tenantId)
+    .single()
+  if (error || !data) return { defaultLanguage: "en", supportedLanguages: ["en"] }
+  return {
+    defaultLanguage: data.default_language || "en",
+    supportedLanguages: Array.isArray(data.supported_languages) && data.supported_languages.length ? data.supported_languages : [data.default_language || "en"],
+  }
+}

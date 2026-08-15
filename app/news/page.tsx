@@ -9,8 +9,8 @@ export const metadata = {
 
 export const revalidate = 60
 
-export default async function NewsPage() {
-  const news = await getNews()
+export async function NewsPageContent({ locale = "en" }: { locale?: string }) {
+  const news = await getNews(locale)
   return (
     <>
       <Header />
@@ -23,4 +23,8 @@ export default async function NewsPage() {
       <Footer />
     </>
   )
+}
+
+export default function NewsPage() {
+  return <NewsPageContent />
 }

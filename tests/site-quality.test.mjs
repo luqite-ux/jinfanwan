@@ -115,3 +115,17 @@ test("product records match the four verified brochure image groups", () => {
   )
   assert.equal(siteData.news.length, 0, "unverified demo news must not be published")
 })
+
+test("locale routes and language-aware data access remain available for expansion", () => {
+  const requiredLocaleRoutes = [
+    "app/[locale]/page.tsx",
+    "app/[locale]/products/page.tsx",
+    "app/[locale]/products/[slug]/page.tsx",
+    "app/[locale]/news/page.tsx",
+    "app/[locale]/news/[slug]/page.tsx",
+  ]
+  for (const route of requiredLocaleRoutes) assert.equal(fs.existsSync(path.join(root, route)), true, `${route} should exist`)
+  const dataLayer = fs.readFileSync(path.join(root, "lib/content-db.ts"), "utf8")
+  assert.match(dataLayer, /localized\(row\.name_i18n, locale\)/)
+  assert.match(dataLayer, /getLanguageConfig/)
+})

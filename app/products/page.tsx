@@ -11,8 +11,9 @@ export const metadata = {
 
 export const revalidate = 60
 
-export default async function ProductsPage() {
-  const [categories, products] = await Promise.all([getCategories(), getProducts()])
+export async function ProductsPageContent({ locale = "en" }: { locale?: string }) {
+  const [categories, products] = await Promise.all([getCategories(locale), getProducts(locale)])
+  const localePrefix = locale === "en" ? "" : `/${locale}`
   return (
     <>
       <Header />
@@ -38,7 +39,7 @@ export default async function ProductsPage() {
           <SectionHeading eyebrow="Product families" title="Choose a series and send requirements" />
           <div className="product-grid">
             {products.map((product) => (
-              <Link className="product-card" href={`/products/${product.slug}`} key={product.slug}>
+              <Link className="product-card" href={`${localePrefix}/products/${product.slug}`} key={product.slug}>
                 <img src={product.image} alt={product.name} />
                 <div>
                   <span className="pill">{product.category}</span>
@@ -54,4 +55,8 @@ export default async function ProductsPage() {
       <Footer />
     </>
   )
+}
+
+export default function ProductsPage() {
+  return <ProductsPageContent />
 }

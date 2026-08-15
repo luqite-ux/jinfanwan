@@ -7,8 +7,9 @@ import { company, faqs, processSteps, stats } from "@/lib/site-data"
 
 export const revalidate = 60
 
-export default async function HomePage() {
-  const [categories, products, news] = await Promise.all([getCategories(), getProducts(), getNews()])
+export async function HomePageContent({ locale = "en" }: { locale?: string }) {
+  const [categories, products, news] = await Promise.all([getCategories(locale), getProducts(locale), getNews(locale)])
+  const localePrefix = locale === "en" ? "" : `/${locale}`
   return (
     <>
       <Header />
@@ -23,7 +24,7 @@ export default async function HomePage() {
             </p>
             <div className="hero-actions">
               <Link href="/contact#inquiry" className="primary-action">Request a Quote <ArrowRight size={16} /></Link>
-              <Link href="/products" className="secondary-action">Explore Products</Link>
+              <Link href={`${localePrefix}/products`} className="secondary-action">Explore Products</Link>
             </div>
           </div>
           <div className="hero-visual">
@@ -51,7 +52,7 @@ export default async function HomePage() {
           />
           <div className="category-grid">
             {categories.map((category) => (
-              <Link href="/products" key={category.slug} className="category-card">
+              <Link href={`${localePrefix}/products`} key={category.slug} className="category-card">
                 <img src={category.image} alt={category.name} />
                 <h3>{category.name}</h3>
                 <p>{category.summary}</p>
@@ -69,7 +70,7 @@ export default async function HomePage() {
           />
           <div className="product-grid">
             {products.slice(0, 4).map((product) => (
-              <Link className="product-card" href={`/products/${product.slug}`} key={product.slug}>
+              <Link className="product-card" href={`${localePrefix}/products/${product.slug}`} key={product.slug}>
                 <img src={product.image} alt={product.name} />
                 <div>
                   <span className="pill">{product.category}</span>
@@ -133,7 +134,7 @@ export default async function HomePage() {
             <SectionHeading eyebrow="News" title="Sourcing insights" />
             <div className="news-list">
               {news.length ? news.map((post) => (
-                <Link href={`/news/${post.slug}`} key={post.slug}>
+                <Link href={`${localePrefix}/news/${post.slug}`} key={post.slug}>
                   <time>{post.date}</time>
                   <h3>{post.title}</h3>
                   <p>{post.excerpt}</p>
@@ -155,4 +156,8 @@ export default async function HomePage() {
       <Footer />
     </>
   )
+}
+
+export default function HomePage() {
+  return <HomePageContent />
 }
