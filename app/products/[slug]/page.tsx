@@ -42,7 +42,7 @@ export default async function ProductDetailPage({ params }: ProductDetailProps) 
     "@type": "Product",
     name: product.name,
     description: product.summary,
-    image: `${company.siteUrl}${product.image}`,
+    image: product.image.startsWith("http") ? product.image : `${company.siteUrl}${product.image}`,
     brand: { "@type": "Brand", name: company.brand },
   }
 
