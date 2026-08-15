@@ -63,10 +63,10 @@ Run: `pnpm build`
 
 Expected: build exits `0` and includes `/admin/login`, `/admin/logout`, and `/api/auth/login`.
 
-- [ ] **Step 6: Commit and deploy**
+- [x] **Step 6: Commit and deploy**
 
 Commit only the customer-site files, push `luqite-ux/jinfanwan` `main` with the company token workflow, and deploy the existing Vercel project to Production.
 
-- [ ] **Step 7: Verify the formal-domain flow**
+- [x] **Step 7: Verify the formal-domain flow**
 
 Open `https://jinfanwanfoodstorage.com/admin/login`, sign in with `info@jinfanwanfoodstorage.com`, verify the final customer-domain `/admin` page and tenant dashboard, then log out and verify the protected page redirects to login.
