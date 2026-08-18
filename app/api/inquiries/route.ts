@@ -1,6 +1,27 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseClient } from '@/lib/supabase'
 
+async function notifyInquiryEmail(tenantId: string, inquiryId: string) {
+  const secret = process.env.INQUIRY_NOTIFY_SECRET?.trim()
+  const adminUrl = (process.env.HUANQIU_ADMIN_URL ?? process.env.NEXT_PUBLIC_ADMIN_URL)?.trim().replace(/\/$/, '')
+  if (!secret || !adminUrl) return
+
+  try {
+    const response = await fetch(`${adminUrl}/api/inquiries/notify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-inquiry-notify-secret': secret,
+      },
+      body: JSON.stringify({ tenantId, inquiryId }),
+    })
+    if (!response.ok) {
+      console.warn('[inquiries] notification request failed', response.status)
+    }
+  } catch (error) {
+    console.warn('[inquiries] notification request error', error)
+  }
+}
 type InquiryPayload = Record<string, FormDataEntryValue | string | null | undefined>
 
 function text(value: InquiryPayload[string]) {
@@ -44,7 +65,7 @@ export async function POST(request: Request) {
     country && `Country / Region: ${country}`,
   ].filter(Boolean).join('\n\n')
 
-  const { error } = await supabase.from('inquiries').insert({
+  const { data, error } = await supabase.from('inquiries').insert({
     tenant_id: tenantId,
     name,
     email,
@@ -53,8 +74,9 @@ export async function POST(request: Request) {
     subject,
     message: composedMessage,
     status: 'unread',
-  })
+  }).select('id').single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (data?.id) await notifyInquiryEmail(tenantId, data.id)
   return NextResponse.json({ ok: true })
 }
