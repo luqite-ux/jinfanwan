@@ -65,7 +65,9 @@ export async function POST(request: Request) {
     country && `Country / Region: ${country}`,
   ].filter(Boolean).join('\n\n')
 
-  const { data, error } = await supabase.from('inquiries').insert({
+  const inquiryId = crypto.randomUUID()
+  const { error } = await supabase.from('inquiries').insert({
+    id: inquiryId,
     tenant_id: tenantId,
     name,
     email,
@@ -74,9 +76,9 @@ export async function POST(request: Request) {
     subject,
     message: composedMessage,
     status: 'unread',
-  }).select('id').single()
+  })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  if (data?.id) await notifyInquiryEmail(tenantId, data.id)
+  await notifyInquiryEmail(tenantId, inquiryId)
   return NextResponse.json({ ok: true })
 }
