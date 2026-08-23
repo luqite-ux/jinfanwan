@@ -37,11 +37,14 @@ export function Header() {
 }
 
 export function Footer() {
+  const legalName = "Suzhou Golden Rice Bowl New Material Technology Co., Ltd.".replace(/[.\s]+$/, "")
   return (
     <footer className="footer">
       <div className="footer-grid">
         <div>
-          <img src={company.logo} alt="JINFANWAN" className="footer-logo" />
+          <Link href="/" aria-label="JINFANWAN home">
+            <img src={company.logo} alt="JINFANWAN" className="footer-logo" style={{ objectFit: "contain", maxWidth: "100%", height: "auto" }} />
+          </Link>
           <p>
             Food storage container manufacturing for global B2B buyers, covering plastic containers and
             tempered-glass, plastic, and silicone lid structures.
@@ -69,6 +72,7 @@ export function Footer() {
           <Link href="/contact#inquiry" className="footer-cta">Send Inquiry</Link>
         </div>
       </div>
+      <div className="footer-bottom">© {new Date().getFullYear()} {legalName}. All rights reserved.</div>
     </footer>
   )
 }

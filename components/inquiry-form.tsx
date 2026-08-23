@@ -2,10 +2,12 @@
 
 import { useState } from "react"
 import { Send } from "lucide-react"
+import { InquiryCaptchaField } from "@/components/inquiry-captcha-field"
 
 export function InquiryForm({ product }: { product?: string }) {
   const [state, setState] = useState<"idle" | "submitting" | "success" | "error">("idle")
   const [error, setError] = useState("")
+  const [captchaRefreshKey, setCaptchaRefreshKey] = useState(0)
 
   return (
     <form
@@ -15,18 +17,26 @@ export function InquiryForm({ product }: { product?: string }) {
         event.preventDefault()
         setState("submitting")
         setError("")
-        const response = await fetch("/api/inquiries", {
-          method: "POST",
-          body: new FormData(event.currentTarget),
-        })
-        if (response.ok) {
-          setState("success")
-          event.currentTarget.reset()
-          return
+        const form = event.currentTarget
+        try {
+          const response = await fetch("/api/inquiries", {
+            method: "POST",
+            body: new FormData(form),
+          })
+          if (response.ok) {
+            setState("success")
+            form.reset()
+            return
+          }
+          const payload = await response.json().catch(() => ({ error: "Inquiry submission failed." }))
+          setError(payload.error || "Inquiry submission failed.")
+          setState("error")
+        } catch {
+          setError("Inquiry submission failed.")
+          setState("error")
+        } finally {
+          setCaptchaRefreshKey((key) => key + 1)
         }
-        const payload = await response.json().catch(() => ({ error: "Inquiry submission failed." }))
-        setError(payload.error || "Inquiry submission failed.")
-        setState("error")
       }}
     >
       <div className="form-grid">
@@ -67,6 +77,7 @@ export function InquiryForm({ product }: { product?: string }) {
         Message
         <textarea name="message" rows={4} required placeholder="Tell us about your sourcing plan" />
       </label>
+      <InquiryCaptchaField refreshKey={captchaRefreshKey} />
       <button type="submit" className="primary-action" disabled={state === "submitting"}>
         {state === "submitting" ? "Submitting..." : "Submit Inquiry"} <Send size={16} />
       </button>

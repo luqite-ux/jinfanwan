@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseClient } from '@/lib/supabase'
+import { createSupabaseCaptchaContextFromEnv, verifyCaptchaSubmission } from '@/lib/inquiry-captcha'
 
 async function notifyInquiryEmail(tenantId: string, inquiryId: string) {
   const secret = process.env.INQUIRY_NOTIFY_SECRET?.trim()
@@ -40,6 +41,27 @@ async function readPayload(request: Request): Promise<InquiryPayload> {
 
 export async function POST(request: Request) {
   const payload = await readPayload(request)
+  const secret = process.env.CAPTCHA_SECRET?.trim()
+  if (!secret) {
+    return NextResponse.json({ error: 'Inquiry service is temporarily unavailable.' }, { status: 503 })
+  }
+
+  try {
+    const { store, tenantId, siteScope } = createSupabaseCaptchaContextFromEnv()
+    const captcha = await verifyCaptchaSubmission({
+      secret, store, tenantId, siteScope,
+      scope: text(payload.captchaScope),
+      token: text(payload.captchaToken),
+      answer: text(payload.captchaAnswer),
+    })
+    if (!captcha.ok) {
+      return NextResponse.json({ error: 'Invalid or expired CAPTCHA. Please refresh and try again.' }, { status: 400 })
+    }
+  } catch (error) {
+    console.error('[inquiries] CAPTCHA verification failed', error instanceof Error ? error.message : error)
+    return NextResponse.json({ error: 'Inquiry service is temporarily unavailable.' }, { status: 503 })
+  }
+
   const tenantId = process.env['TENANT_ID'] ?? process.env['NEXT_PUBLIC_TENANT_ID']
   const supabase = getSupabaseClient()
   if (!tenantId || !supabase) {
