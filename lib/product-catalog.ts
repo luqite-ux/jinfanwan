@@ -111,8 +111,7 @@ const sources: ProductSource[] = [
 ]
 
 function imageForSlide(slide: number) {
-  const extension = slide >= 36 && slide <= 40 ? "jpg" : "png"
-  return `/images/products/expanded/slide-${String(slide).padStart(2, "0")}.${extension}`
+  return `/images/products/beautified/slide-${String(slide).padStart(2, "0")}.png`
 }
 
 export const expandedProducts: ProductRecord[] = sources.map(([sourceSlide, slug, name, sourceNameZh, category, tags]) => ({
