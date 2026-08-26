@@ -110,6 +110,11 @@ test("expanded catalog preserves every customer-supplied slide as a distinct pro
   assert.equal(new Set(expandedProducts.map((product) => product.slug)).size, 41)
   assert.equal(new Set(expandedProducts.map((product) => product.image)).size, 41)
   assert.equal(
+    expandedCategories.every((category) => category.image.startsWith("/images/products/beautified/")),
+    true,
+    "category cards must use the approved beautified image set",
+  )
+  assert.equal(
     expandedProducts.every((product) => /^\/images\/products\/beautified\/slide-\d{2}\.png$/.test(product.image)),
     true,
     "published products must use the approved beautified image set",

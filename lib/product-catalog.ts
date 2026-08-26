@@ -22,37 +22,37 @@ export const expandedCategories: ProductCategory[] = [
   {
     slug: "hinged-plastic-containers",
     name: "Hinged Plastic Containers",
-    image: "/images/products/expanded/slide-01.png",
+    image: "/images/products/beautified/slide-01.png",
     summary: "Vented and non-vented hinged food container formats in square, rectangular, and round shapes.",
   },
   {
     slug: "hinged-glass-lid-containers",
     name: "Hinged Glass-Lid Containers",
-    image: "/images/products/expanded/slide-07.png",
+    image: "/images/products/beautified/slide-07.png",
     summary: "Hinged glass-lid container formats with vented and non-vented configurations.",
   },
   {
     slug: "hinged-stainless-steel-lid-containers",
     name: "Hinged Stainless-Steel-Lid Containers",
-    image: "/images/products/expanded/slide-13.png",
+    image: "/images/products/beautified/slide-13.png",
     summary: "Hinged stainless-steel-lid formats shown with compatible container and bowl options.",
   },
   {
     slug: "two-clip-plastic-glass-containers",
     name: "Two-Clip Plastic-and-Glass Containers",
-    image: "/images/products/expanded/slide-17.png",
+    image: "/images/products/beautified/slide-17.png",
     summary: "Two-clip plastic-and-glass container formats in square, rectangular, and round shapes.",
   },
   {
     slug: "silicone-glass-containers",
     name: "Silicone-and-Glass Containers",
-    image: "/images/products/expanded/slide-24.png",
+    image: "/images/products/beautified/slide-24.png",
     summary: "Silicone-and-glass food container formats represented in the supplied product range.",
   },
   {
     slug: "silicone-glass-lids",
     name: "Silicone-and-Glass Lids",
-    image: "/images/products/expanded/slide-36.jpg",
+    image: "/images/products/beautified/slide-36.png",
     summary: "Two-clip silicone-and-glass lid formats, including vacuum-lid variants.",
   },
 ]
