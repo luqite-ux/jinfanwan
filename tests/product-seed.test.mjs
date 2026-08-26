@@ -29,20 +29,34 @@ test("catalog validation rejects duplicate or incomplete slide mappings before d
 
 test("repeat synchronization preserves maintained translations and metadata", () => {
   const generated = {
+    image_url: "generated-image",
+    specs: { generated: true },
     name_i18n: { en: "Generated English" },
     description_i18n: { en: "Generated description" },
-    extra_data: { source_slide: 1, source: "customer expansion PPT" },
+    extra_data: { source_slide: 1, source: "customer expansion PPT", images: ["generated-image"], source_name_zh: "generated" },
   }
   const existing = {
+    image_url: "maintained-image",
+    specs: { maintained: true },
     name_i18n: { en: "Existing English", de: "Bestehender Name" },
     description_i18n: { en: "Existing description", de: "Bestehende Beschreibung" },
-    extra_data: { source_slide: 1, manually_maintained_fields: ["name_i18n.en"], sales_note: "keep" },
+    extra_data: {
+      source_slide: 1,
+      images: ["maintained-image"],
+      source_name_zh: "maintained",
+      manually_maintained_fields: ["name_i18n.en", "description_i18n", "image_url", "specs", "extra_data.images", "extra_data.source_name_zh"],
+      sales_note: "keep",
+    },
   }
   const merged = mergeMaintainedRow(generated, existing)
 
   assert.equal(merged.name_i18n.en, "Existing English")
   assert.equal(merged.name_i18n.de, "Bestehender Name")
-  assert.equal(merged.description_i18n.en, "Generated description")
+  assert.equal(merged.description_i18n.en, "Existing description")
   assert.equal(merged.description_i18n.de, "Bestehende Beschreibung")
+  assert.equal(merged.image_url, "maintained-image")
+  assert.deepEqual(merged.specs, { maintained: true })
+  assert.deepEqual(merged.extra_data.images, ["maintained-image"])
+  assert.equal(merged.extra_data.source_name_zh, "maintained")
   assert.equal(merged.extra_data.sales_note, "keep")
 })

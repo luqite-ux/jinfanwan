@@ -82,12 +82,24 @@ export function mergeMaintainedRow<T extends Record<string, any>>(generated: T, 
   const manual = new Set(existing.extra_data?.manually_maintained_fields ?? [])
   const merged: Record<string, any> = { ...generated }
   for (const key of Object.keys(generated).filter((field) => field.endsWith("_i18n"))) {
+    if (manual.has(key)) {
+      merged[key] = existing[key] ?? generated[key]
+      continue
+    }
     merged[key] = { ...(existing[key] ?? {}), ...(generated[key] ?? {}) }
     for (const locale of Object.keys(existing[key] ?? {})) {
       if (locale !== "en" || manual.has(`${key}.${locale}`)) merged[key][locale] = existing[key][locale]
     }
   }
   merged.extra_data = { ...(existing.extra_data ?? {}), ...(generated.extra_data ?? {}) }
+  for (const field of manual) {
+    if (field.startsWith("extra_data.")) {
+      const nested = field.slice("extra_data.".length)
+      if (nested in (existing.extra_data ?? {})) merged.extra_data[nested] = existing.extra_data[nested]
+    } else if (!field.includes(".") && field in existing && !field.endsWith("_i18n")) {
+      merged[field] = existing[field]
+    }
+  }
   if (existing.extra_data?.manually_maintained_fields) {
     merged.extra_data.manually_maintained_fields = existing.extra_data.manually_maintained_fields
   }

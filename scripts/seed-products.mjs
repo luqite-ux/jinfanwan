@@ -84,14 +84,10 @@ const seed = {
   products: generated.products.map((row) => mergeMaintainedRow(row, existingProductBySlug.get(row.slug))),
 }
 validateCatalogSeed(seed)
-for (const row of seed.categories) {
-  const result = await db.from("product_categories").upsert(row, { onConflict: "tenant_id,slug" })
-  if (result.error) throw result.error
-}
-for (const row of seed.products) {
-  const result = await db.from("products").upsert(row, { onConflict: "tenant_id,slug" })
-  if (result.error) throw result.error
-}
+const categoriesWrite = await db.from("product_categories").upsert(seed.categories, { onConflict: "tenant_id,slug" })
+if (categoriesWrite.error) throw categoriesWrite.error
+const productsWrite = await db.from("products").upsert(seed.products, { onConflict: "tenant_id,slug" })
+if (productsWrite.error) throw productsWrite.error
 
 const productSlugs = seed.products.map((row) => row.slug)
 const categorySlugs = seed.categories.map((row) => row.slug)
