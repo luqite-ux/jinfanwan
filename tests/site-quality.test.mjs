@@ -130,8 +130,13 @@ test("site fallback and category filtering expose the complete expanded catalog"
   assert.equal(siteData.products.length, 41)
   assert.equal(siteData.categories.length, 6)
   assert.equal(filterProductsByCategory(expandedProducts, "all").length, 41)
-  assert.equal(filterProductsByCategory(expandedProducts, "Silicone-and-Glass Lids").length, 6)
+  assert.equal(filterProductsByCategory(expandedProducts, "silicone-glass-lids").length, 6)
   assert.deepEqual(filterProductsByCategory(expandedProducts, "missing-category"), [])
+})
+
+test("category filtering uses stable slugs instead of translated display names", () => {
+  const translatedProducts = expandedProducts.map((product) => ({ ...product, category: `Translated ${product.category}` }))
+  assert.equal(filterProductsByCategory(translatedProducts, "silicone-glass-lids").length, 6)
 })
 
 test("locale routes and language-aware data access remain available for expansion", () => {

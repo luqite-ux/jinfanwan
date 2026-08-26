@@ -1,6 +1,6 @@
 import assert from "node:assert/strict"
 import test from "node:test"
-import { buildCatalogSeed } from "../lib/catalog-seed.ts"
+import { buildCatalogSeed, mergeMaintainedRow, validateCatalogSeed } from "../lib/catalog-seed.ts"
 
 const tenantId = "d1690bc3-c00b-4558-b669-92a7adf93179"
 
@@ -14,8 +14,35 @@ test("catalog seed builds tenant-scoped multilingual rows for all supplied produ
   assert.equal(seed.products.every((row) => row.description_i18n.en === row.description), true)
   assert.deepEqual(seed.products.map((row) => row.extra_data.source_slide), Array.from({ length: 41 }, (_, index) => index + 1))
   assert.equal(seed.products.every((row) => row.image_url.startsWith("https://assets.example.test/")), true)
+  assert.doesNotThrow(() => validateCatalogSeed(seed))
 })
 
 test("catalog seed refuses an empty tenant identity", () => {
   assert.throws(() => buildCatalogSeed("", (image) => image), /tenant/i)
+})
+
+test("catalog validation rejects duplicate or incomplete slide mappings before destructive sync", () => {
+  const seed = buildCatalogSeed(tenantId, (image) => `https://assets.example.test${image}`)
+  seed.products[40].extra_data.source_slide = 40
+  assert.throws(() => validateCatalogSeed(seed), /slide/i)
+})
+
+test("repeat synchronization preserves maintained translations and metadata", () => {
+  const generated = {
+    name_i18n: { en: "Generated English" },
+    description_i18n: { en: "Generated description" },
+    extra_data: { source_slide: 1, source: "customer expansion PPT" },
+  }
+  const existing = {
+    name_i18n: { en: "Existing English", de: "Bestehender Name" },
+    description_i18n: { en: "Existing description", de: "Bestehende Beschreibung" },
+    extra_data: { source_slide: 1, manually_maintained_fields: ["name_i18n.en"], sales_note: "keep" },
+  }
+  const merged = mergeMaintainedRow(generated, existing)
+
+  assert.equal(merged.name_i18n.en, "Existing English")
+  assert.equal(merged.name_i18n.de, "Bestehender Name")
+  assert.equal(merged.description_i18n.en, "Generated description")
+  assert.equal(merged.description_i18n.de, "Bestehende Beschreibung")
+  assert.equal(merged.extra_data.sales_note, "keep")
 })

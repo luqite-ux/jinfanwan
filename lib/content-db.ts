@@ -49,7 +49,7 @@ export async function getProducts(locale = "en") {
 
   const { data, error } = await db
     .from("products")
-    .select("slug,name,name_i18n,category,description,description_i18n,features_i18n,specs,image_url,sort_order")
+    .select("slug,name,name_i18n,category,category_slug,description,description_i18n,features_i18n,specs,image_url,sort_order")
     .eq("tenant_id", tenantId)
     .eq("is_active", true)
     .order("sort_order")
@@ -62,6 +62,7 @@ export async function getProducts(locale = "en") {
       slug: row.slug,
       name: localized(row.name_i18n, locale) ?? row.name,
       category: row.category,
+      categorySlug: row.category_slug ?? fallback?.categorySlug ?? "",
       image: row.image_url,
       tags,
       summary: localized(row.description_i18n, locale) ?? row.description,

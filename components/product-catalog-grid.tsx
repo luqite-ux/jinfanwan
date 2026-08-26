@@ -25,13 +25,13 @@ export function ProductCatalogGrid({ categories, products, localePrefix }: {
           All products <span>{products.length}</span>
         </button>
         {categories.map((category) => {
-          const count = products.filter((product) => product.category === category.name).length
+          const count = products.filter((product) => product.categorySlug === category.slug).length
           return (
             <button
               type="button"
               key={category.slug}
-              aria-pressed={activeCategory === category.name}
-              onClick={() => setActiveCategory(category.name)}
+              aria-pressed={activeCategory === category.slug}
+              onClick={() => setActiveCategory(category.slug)}
             >
               {category.name} <span>{count}</span>
             </button>

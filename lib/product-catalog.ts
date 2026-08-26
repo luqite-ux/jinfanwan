@@ -11,6 +11,7 @@ export type ProductRecord = {
   sourceNameZh: string
   sourceSlide: number
   category: string
+  categorySlug: string
   image: string
   tags: string[]
   summary: string
@@ -120,6 +121,7 @@ export const expandedProducts: ProductRecord[] = sources.map(([sourceSlide, slug
   sourceNameZh,
   sourceSlide,
   category,
+  categorySlug: expandedCategories.find((item) => item.name === category)!.slug,
   image: imageForSlide(sourceSlide),
   tags: [...tags],
   summary: `${name} from the JINFANWAN food storage product range for B2B sourcing inquiries.`,
@@ -137,6 +139,6 @@ export const sourceSlides = expandedProducts.map(({ sourceSlide: slide, sourceNa
   image,
 }))
 
-export function filterProductsByCategory(products: ProductRecord[], category: string) {
-  return category === "all" ? products : products.filter((product) => product.category === category)
+export function filterProductsByCategory(products: ProductRecord[], categorySlug: string) {
+  return categorySlug === "all" ? products : products.filter((product) => product.categorySlug === categorySlug)
 }

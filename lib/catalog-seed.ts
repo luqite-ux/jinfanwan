@@ -57,3 +57,39 @@ export function buildCatalogSeed(tenantId: string, publicImageUrl: (image: strin
 
   return { categories, products }
 }
+
+export function validateCatalogSeed(seed: ReturnType<typeof buildCatalogSeed>) {
+  if (seed.categories.length !== 6) throw new Error("Catalog must contain exactly 6 categories")
+  if (seed.products.length !== 41) throw new Error("Catalog must contain exactly 41 source slides")
+  const slides = seed.products.map((row) => row.extra_data.source_slide).sort((a, b) => a - b)
+  const expectedSlides = Array.from({ length: 41 }, (_, index) => index + 1)
+  if (JSON.stringify(slides) !== JSON.stringify(expectedSlides)) throw new Error("Source slide mapping must cover 1 through 41 exactly once")
+  for (const [label, values] of [
+    ["product slug", seed.products.map((row) => row.slug)],
+    ["category slug", seed.categories.map((row) => row.slug)],
+    ["product image", seed.products.map((row) => row.image_url)],
+  ] as const) {
+    if (values.some((value) => !value) || new Set(values).size !== values.length) throw new Error(`${label} values must be nonempty and unique`)
+  }
+  const categorySlugs = new Set(seed.categories.map((row) => row.slug))
+  if (seed.products.some((row) => !row.category_slug || !categorySlugs.has(row.category_slug))) {
+    throw new Error("Every product must reference an expected category slug")
+  }
+}
+
+export function mergeMaintainedRow<T extends Record<string, any>>(generated: T, existing?: Record<string, any> | null): T {
+  if (!existing) return generated
+  const manual = new Set(existing.extra_data?.manually_maintained_fields ?? [])
+  const merged: Record<string, any> = { ...generated }
+  for (const key of Object.keys(generated).filter((field) => field.endsWith("_i18n"))) {
+    merged[key] = { ...(existing[key] ?? {}), ...(generated[key] ?? {}) }
+    for (const locale of Object.keys(existing[key] ?? {})) {
+      if (locale !== "en" || manual.has(`${key}.${locale}`)) merged[key][locale] = existing[key][locale]
+    }
+  }
+  merged.extra_data = { ...(existing.extra_data ?? {}), ...(generated.extra_data ?? {}) }
+  if (existing.extra_data?.manually_maintained_fields) {
+    merged.extra_data.manually_maintained_fields = existing.extra_data.manually_maintained_fields
+  }
+  return merged as T
+}

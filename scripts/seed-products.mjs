@@ -2,7 +2,7 @@
 import fs from "node:fs"
 import path from "node:path"
 import { createClient } from "@supabase/supabase-js"
-import { buildCatalogSeed } from "../lib/catalog-seed.ts"
+import { buildCatalogSeed, mergeMaintainedRow, validateCatalogSeed } from "../lib/catalog-seed.ts"
 import { expandedProducts } from "../lib/product-catalog.ts"
 
 const root = path.resolve(import.meta.dirname, "..")
@@ -40,6 +40,7 @@ if (tenantRead.data.domain !== expectedDomain || tenantRead.data.name !== "jinfa
 
 if (mode === "check") {
   const preview = buildCatalogSeed(tenantId, (image) => `r2://tenants/jinfanwan${image}`)
+  validateCatalogSeed(preview)
   console.log(JSON.stringify({ mode, tenant: tenantRead.data, categoryCount: preview.categories.length, productCount: preview.products.length }, null, 2))
 } else {
 for (const key of ["R2_S3_ENDPOINT", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_PUBLIC_URL_PREFIX"]) {
@@ -69,7 +70,20 @@ for (const image of new Set(expandedProducts.map((product) => product.image))) {
   uploaded.set(image, `${publicBase}/${key}`)
 }
 
-const seed = buildCatalogSeed(tenantId, (image) => uploaded.get(image))
+const generated = buildCatalogSeed(tenantId, (image) => uploaded.get(image))
+validateCatalogSeed(generated)
+const [existingCategories, existingProducts] = await Promise.all([
+  db.from("product_categories").select("*").eq("tenant_id", tenantId).in("slug", generated.categories.map((row) => row.slug)),
+  db.from("products").select("*").eq("tenant_id", tenantId).in("slug", generated.products.map((row) => row.slug)),
+])
+for (const result of [existingCategories, existingProducts]) if (result.error) throw result.error
+const existingCategoryBySlug = new Map(existingCategories.data.map((row) => [row.slug, row]))
+const existingProductBySlug = new Map(existingProducts.data.map((row) => [row.slug, row]))
+const seed = {
+  categories: generated.categories.map((row) => mergeMaintainedRow(row, existingCategoryBySlug.get(row.slug))),
+  products: generated.products.map((row) => mergeMaintainedRow(row, existingProductBySlug.get(row.slug))),
+}
+validateCatalogSeed(seed)
 for (const row of seed.categories) {
   const result = await db.from("product_categories").upsert(row, { onConflict: "tenant_id,slug" })
   if (result.error) throw result.error
@@ -81,6 +95,17 @@ for (const row of seed.products) {
 
 const productSlugs = seed.products.map((row) => row.slug)
 const categorySlugs = seed.categories.map((row) => row.slug)
+const [stagedCategories, stagedProducts] = await Promise.all([
+  db.from("product_categories").select("slug").eq("tenant_id", tenantId).in("slug", categorySlugs),
+  db.from("products").select("slug,image_url,category_slug,extra_data").eq("tenant_id", tenantId).in("slug", productSlugs),
+])
+for (const result of [stagedCategories, stagedProducts]) if (result.error) throw result.error
+assertExactSet("staged category slugs", stagedCategories.data.map((row) => row.slug), categorySlugs)
+assertExactSet("staged product slugs", stagedProducts.data.map((row) => row.slug), productSlugs)
+assertExactSet("staged source slides", stagedProducts.data.map((row) => row.extra_data?.source_slide), Array.from({ length: 41 }, (_, index) => index + 1))
+if (stagedProducts.data.some((row) => !row.image_url?.startsWith(publicBase) || !categorySlugs.includes(row.category_slug))) {
+  throw new Error("Staged catalog references are incomplete; old rows remain active")
+}
 for (const [table, slugs] of [["products", productSlugs], ["product_categories", categorySlugs]]) {
   const result = await db.from(table).update({ is_active: false }).eq("tenant_id", tenantId).not("slug", "in", `(${slugs.join(",")})`)
   if (result.error) throw result.error
@@ -97,6 +122,9 @@ if (categoriesRead.data.length !== 6 || productsRead.data.length !== 41) throw n
 if (productsRead.data.some((row) => !row.image_url?.startsWith(publicBase) || !row.name_i18n?.en || !row.description_i18n?.en)) {
   throw new Error("Catalog readback content mismatch")
 }
+assertExactSet("active category slugs", categoriesRead.data.map((row) => row.slug), categorySlugs)
+assertExactSet("active product slugs", productsRead.data.map((row) => row.slug), productSlugs)
+assertExactSet("active source slides", productsRead.data.map((row) => row.extra_data?.source_slide), Array.from({ length: 41 }, (_, index) => index + 1))
 
 console.log(JSON.stringify({
   mode,
@@ -107,4 +135,10 @@ console.log(JSON.stringify({
   lastProduct: productsRead.data.find((row) => row.extra_data?.source_slide === 41)?.slug,
 }, null, 2))
 r2.destroy()
+}
+
+function assertExactSet(label, actual, expected) {
+  const normalizedActual = [...actual].sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true }))
+  const normalizedExpected = [...expected].sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true }))
+  if (JSON.stringify(normalizedActual) !== JSON.stringify(normalizedExpected)) throw new Error(`${label} mismatch`)
 }
