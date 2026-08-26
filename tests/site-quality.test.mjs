@@ -4,6 +4,7 @@ import path from "node:path"
 import test from "node:test"
 import { company } from "../lib/site-data.ts"
 import * as siteData from "../lib/site-data.ts"
+import { expandedCategories, expandedProducts, filterProductsByCategory, sourceSlides } from "../lib/product-catalog.ts"
 
 const root = path.resolve(import.meta.dirname, "..")
 
@@ -62,10 +63,10 @@ test("detail routes resolve items from asynchronous Next.js params", async () =>
   assert.equal(typeof siteData.findByRouteParams, "function")
   const product = await siteData.findByRouteParams(
     siteData.products,
-    Promise.resolve({ slug: "four-side-lock-plastic-series" }),
+    Promise.resolve({ slug: "hinged-non-vented-square-food-container" }),
   )
 
-  assert.equal(product?.slug, "four-side-lock-plastic-series")
+  assert.equal(product?.slug, "hinged-non-vented-square-food-container")
 })
 
 test("customer admin login handler exists", () => {
@@ -102,18 +103,35 @@ test("published copy contains no template, placeholder, or unsupported marketing
   assert.deepEqual(offenders, [])
 })
 
-test("product records match the four verified brochure image groups", () => {
-  assert.equal(siteData.products.length, 4)
-  assert.deepEqual(
-    siteData.products.map((product) => product.image),
-    [
-      "/images/products/product-showcase-04.png",
-      "/images/products/product-showcase-05.png",
-      "/images/products/product-showcase-06.png",
-      "/images/products/product-showcase-08.png",
-    ],
+test("expanded catalog preserves every customer-supplied slide as a distinct product", () => {
+  assert.equal(sourceSlides.length, 41)
+  assert.deepEqual(sourceSlides.map((item) => item.slide), Array.from({ length: 41 }, (_, index) => index + 1))
+  assert.equal(expandedProducts.length, 41)
+  assert.equal(new Set(expandedProducts.map((product) => product.slug)).size, 41)
+  assert.equal(new Set(expandedProducts.map((product) => product.image)).size, 41)
+
+  const categoryNames = new Set(expandedCategories.map((category) => category.name))
+  for (const product of expandedProducts) {
+    assert.equal(categoryNames.has(product.category), true, `${product.slug} references a missing category`)
+    const image = path.join(root, "public", product.image.replace(/^\//, ""))
+    assert.equal(fs.existsSync(image), true, `${product.slug} image should exist`)
+    assert.ok(fs.statSync(image).size > 1_000, `${product.slug} image should be readable`)
+  }
+
+  assert.equal(
+    expandedProducts.filter((product) => product.sourceNameZh === "两扣塑料玻璃正方形保鲜盒").length,
+    3,
+    "repeated customer-supplied products must remain distinct",
   )
   assert.equal(siteData.news.length, 0, "unverified demo news must not be published")
+})
+
+test("site fallback and category filtering expose the complete expanded catalog", () => {
+  assert.equal(siteData.products.length, 41)
+  assert.equal(siteData.categories.length, 6)
+  assert.equal(filterProductsByCategory(expandedProducts, "all").length, 41)
+  assert.equal(filterProductsByCategory(expandedProducts, "Silicone-and-Glass Lids").length, 6)
+  assert.deepEqual(filterProductsByCategory(expandedProducts, "missing-category"), [])
 })
 
 test("locale routes and language-aware data access remain available for expansion", () => {

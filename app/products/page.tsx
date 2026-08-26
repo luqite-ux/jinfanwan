@@ -1,6 +1,5 @@
-import Link from "next/link"
-import { ArrowRight } from "lucide-react"
 import { Footer, Header, PageHero, SectionHeading } from "@/components/site-shell"
+import { ProductCatalogGrid } from "@/components/product-catalog-grid"
 import { getCategories, getProducts } from "@/lib/content-db"
 
 export const metadata = {
@@ -37,19 +36,7 @@ export async function ProductsPageContent({ locale = "en" }: { locale?: string }
         </section>
         <section className="section soft-band">
           <SectionHeading eyebrow="Product families" title="Choose a series and send requirements" />
-          <div className="product-grid">
-            {products.map((product) => (
-              <Link className="product-card" href={`${localePrefix}/products/${product.slug}`} key={product.slug}>
-                <img src={product.image} alt={product.name} />
-                <div>
-                  <span className="pill">{product.category}</span>
-                  <h3>{product.name}</h3>
-                  <p>{product.summary}</p>
-                  <span className="card-action">View product <ArrowRight size={15} /></span>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <ProductCatalogGrid categories={categories} products={products} localePrefix={localePrefix} />
         </section>
       </main>
       <Footer />
