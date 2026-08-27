@@ -103,6 +103,20 @@ test("published copy contains no template, placeholder, or unsupported marketing
   assert.deepEqual(offenders, [])
 })
 
+test("English inquiry CAPTCHA contains no hard-coded Chinese interface copy", () => {
+  const captchaFiles = [
+    "components/inquiry-captcha-field.tsx",
+    "app/api/captcha/route.ts",
+    "lib/inquiry-captcha.ts",
+  ]
+  const contents = captchaFiles.map((file) => fs.readFileSync(path.join(root, file), "utf8")).join("\n")
+
+  assert.doesNotMatch(contents, /[\u3400-\u9fff]/)
+  assert.match(contents, /CAPTCHA/)
+  assert.match(contents, /Enter the code/)
+  assert.match(contents, /New code/)
+})
+
 test("expanded catalog preserves every customer-supplied slide as a distinct product", () => {
   assert.equal(sourceSlides.length, 41)
   assert.deepEqual(sourceSlides.map((item) => item.slide), Array.from({ length: 41 }, (_, index) => index + 1))
